@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>図化機シミュレータ</title>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<canvas id="canvas" width="920" height="727" style="height: 80vh;"></canvas>
+	<button onclick="exportData()">CSVで書き出し</button>
+	<script>
+		let xcoord = 475;
+		let altitude = 0;
+		let image = new Image();
+		let ctx = document.getElementById("canvas").getContext("2d");
+
+		let data = [];
+
+		window.onload = function() {
+			
+			ctx.globalCompositeOperation = "lighter";
+
+			image.src = "canvas.png";
+			image.onload = function() {
+				drawCircles();
+			}
+		}
+
+		document.onkeydown = function(e) {
+			if (e.code == "ArrowUp") {
+				altitude += 1;
+			} else if (e.code == "ArrowDown") {
+				altitude -= 1;
+			} else if (e.code == "ArrowLeft") {
+				xcoord -= 10;
+			} else if (e.code == "ArrowRight") {
+				xcoord += 10;
+			} else {
+				if (e.code == "Enter") {
+					data.push([xcoord, altitude]);
+				}
+				return;
+			}
+			drawCircles();
+		}
+
+		function drawCircles() {
+			ctx.clearRect(0, 0, 920, 727);
+			ctx.drawImage(image, 0, 0);
+			
+			ctx.beginPath();
+			ctx.fillStyle = "red";
+			ctx.arc(xcoord + altitude, 300, 10, 0, 7);
+			ctx.fill();
+
+			ctx.beginPath();
+			ctx.fillStyle = "cyan";
+			ctx.arc(xcoord - altitude, 300, 10, 0, 7);
+			ctx.fill();
+		}
+
+		function exportData() {
+			let result = "";
+			for (let item of data) {
+				result += `${item[0]}, ${item[1]}\n`;
+			}
+			
+			let title = prompt("題名を入力してください", "断面図");
+			let blob = new Blob([result], {type: "text/csv"});
+			let link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = `${title}.csv`;
+			link.click();
+		}
+	</script>
+</body>
+</html>
