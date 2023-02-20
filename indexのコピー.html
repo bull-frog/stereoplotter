@@ -7,14 +7,13 @@
 	<meta http-equiv="Cache-Control" content="no-cache">
 </head>
 <body>
-	<canvas id="canvas" width="920" height="727" style="width: 50vw;"></canvas>
-	<canvas id="plot" width="920" height="400" style="width: 50vw; border: 1px solid black;"></canvas>
+	<canvas id="canvas" width="920" height="727" style="height: 80vh;"></canvas>
+	<button onclick="exportData()">CSVで書き出し</button>
 	<script>
 		let xcoord = 475;
 		let altitude = 0;
 		let image = new Image();
 		let ctx = document.getElementById("canvas").getContext("2d");
-		let plt = document.getElementById("plot").getContext("2d");
 
 		let data = [];
 
@@ -30,19 +29,16 @@
 
 		document.onkeydown = function(e) {
 			if (e.code == "ArrowUp") {
-				e.preventDefault();
-				if (altitude <= 14) altitude += 1;
+				altitude += 1;
 			} else if (e.code == "ArrowDown") {
-				e.preventDefault();
-				if (altitude >= 0) altitude -= 1;
+				altitude -= 1;
 			} else if (e.code == "ArrowLeft") {
-				if (xcoord >= 0) xcoord -= 10;
+				xcoord -= 10;
 			} else if (e.code == "ArrowRight") {
-				if (xcoord <= 920) xcoord += 10;
+				xcoord += 10;
 			} else {
 				if (e.code == "Enter") {
 					data.push([xcoord, altitude]);
-					drawCrossSection();
 				}
 				return;
 			}
@@ -62,29 +58,6 @@
 			ctx.fillStyle = "cyan";
 			ctx.arc(xcoord - altitude, 300, 7, 0, 7);
 			ctx.fill();
-		}
-
-		function drawCrossSection() {
-			plt.clearRect(0, 0, 920, 400);
-
-			data.sort(function(first, second) {
-				if (first[0] > second[0]) {
-					return 1;
-				} else if (first[0] < second[0]) {
-					return -1;
-				} else {
-					return 0;
-				}
-			});
-			
-			if (data.length > 0) {
-				plt.beginPath();
-				plt.moveTo(0, 380);
-				for (let coord of data) {
-					plt.lineTo(coord[0], -coord[1] * 15 + 380);
-				}
-				plt.stroke();
-			}
 		}
 
 		function exportData() {
